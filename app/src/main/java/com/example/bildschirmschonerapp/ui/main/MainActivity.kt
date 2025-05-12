@@ -24,6 +24,13 @@ class MainActivity : AppCompatActivity() {
         binding.buttonPower.setOnClickListener {
             Toast.makeText(this, "Power-Button gedrückt", Toast.LENGTH_SHORT).show()
             // Hier die Funktion zum Aktivieren des Bildschirm änderns einfügen
+
+            if(true) //Backgrounddienst läuft
+            {
+                //Dienst killen
+            } else {
+                //Dienst starten
+            }
         }
 
         // Reset-Button Klick
