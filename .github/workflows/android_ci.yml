@@ -1,0 +1,43 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: JDK einrichten
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin' # Temurin ist eine beliebte OpenJDK-Distribution
+        cache: 'gradle' # Gradle-Abhängigkeiten zwischenspeichern, um Builds zu beschleunigen
+
+    # Schritt 3: Gradle Wrapper ausführbar machen
+    - name: Gradle Wrapper ausführbar machen
+      run: chmod +x ./gradlew
+
+    # Schritt 4: Mit Gradle bauen
+    - name: Mit Gradle bauen
+      run: ./gradlew assembleDebug assembleRelease --stacktrace
+
+    # Schritt 5: Unit-Tests ausführen
+    # Dieser Befehl führt lokale Unit-Tests aus (normalerweise im Modul app)
+    - name: Unit-Tests ausführen
+      run: ./gradlew testDebugUnitTest --stacktrace
+
+      #folgendes ist praktisch für die Vorbereitung fürs Deployment
+    - name: Debug-APK hochladen
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug-apk 
+        path: app/build/outputs/apk/debug/app-debug.apk 
+        if-no-files-found: error 
