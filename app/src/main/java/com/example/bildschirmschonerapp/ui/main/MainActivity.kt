@@ -1,12 +1,14 @@
 package com.example.bildschirmschonerapp.ui.main
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -122,10 +124,12 @@ class MainActivity : AppCompatActivity() {
 class BackgroundWorker(appContext: Context, workerParams: WorkerParameters)
     : Worker(appContext, workerParams) {
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun doWork(): Result {
         return try {
             Log.d("MyWorker", "Tick at ${System.currentTimeMillis()}")
-
+            val vm = MainViewModel();
+            vm.setRandomWallpaper(applicationContext)
             //TODO Hier die Hintergrundlogik einfügen (Background ändern)
 
             Result.success()
