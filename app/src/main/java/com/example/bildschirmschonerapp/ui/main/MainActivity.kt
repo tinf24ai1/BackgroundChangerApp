@@ -1,42 +1,70 @@
 package com.example.bildschirmschonerapp.ui.main
 
-import android.os.Build
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.example.bildschirmschonerapp.databinding.ActivityMainBinding
+import java.util.concurrent.TimeUnit
+import androidx.lifecycle.lifecycleScope
+import androidx.work.WorkInfo
+import kotlinx.coroutines.launch
+//import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.guava.await
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
-        val viewmodel = MainViewModel()
         setContentView(view)
 
         // Klickaktionen definieren
 
         // Power-Button Klick
         binding.buttonPower.setOnClickListener {
-            Toast.makeText(this, "Power-Button gedrückt", Toast.LENGTH_SHORT).show()
-            // Hier die Funktion zum Aktivieren des Bildschirm änderns einfügen
+            //Toast.makeText(this, "Power-Button gedrückt", Toast.LENGTH_SHORT).show()
 
-            viewmodel.setRandomWallpaper(applicationContext) // setzt das wallpaper direkt. Sollte im hintergrund laufen.
-            //damit dass funktioniert müssen die permissions im settings menü gegeben werden.
-            if(true) //Backgrounddienst läuft
-            {
-                //Dienst killen
-            } else {
-                //Dienst starten
+                lifecycleScope.launch {
+                    try {
+                    val workManager = WorkManager.getInstance(this@MainActivity)
+                    val workInfos = workManager.getWorkInfosForUniqueWork("MyBackgroundWork").await()
+                    val isRunning = workInfos.any {
+                        it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING
+                    }
+
+                    if (isRunning) {
+                        workManager.cancelUniqueWork("MyBackgroundWork")
+                        Toast.makeText(this@MainActivity, "Dienst gestoppt", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val workRequest = PeriodicWorkRequestBuilder<BackgroundWorker>(15, TimeUnit.MINUTES)
+                            .build()
+
+                        workManager.enqueueUniquePeriodicWork(
+                            "MyBackgroundWork",
+                            ExistingPeriodicWorkPolicy.KEEP,
+                            workRequest
+                        )
+                        Toast.makeText(this@MainActivity, "Dienst gestartet", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                    catch (e: Exception){
+                        Toast.makeText(this@MainActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
             }
+
         }
 
         // Reset-Button Klick
@@ -64,16 +92,6 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-        binding.radioBtnNew.setOnClickListener { view ->
-            binding.radioBtnNew.isChecked = true
-            binding.radioBtnAll.isChecked = false
-        }
-
-        binding.radioBtnAll.setOnClickListener { view ->
-            binding.radioBtnAll.isChecked = true
-            binding.radioBtnNew.isChecked = false
-        }
     }
 
     // Funktion zum Zurücksetzen der Werte
@@ -82,7 +100,6 @@ class MainActivity : AppCompatActivity() {
         binding.editInterval.setText("13") // Intervall auf Standardwert setzen
         binding.seekBar.progress = 13 // SeekBar auf Standardwert setzen
         binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
-        binding.radioBtnNew.isChecked = false
         binding.intervalUnitSpinner.setSelection(0) // Intervall-Einheit auf den ersten Wert setzen
     }
 
@@ -99,5 +116,22 @@ class MainActivity : AppCompatActivity() {
         val intervalValue = binding.seekBar.progress
         val intervalUnit = binding.intervalUnitSpinner.selectedItem.toString()
         // Verarbeite intervalValue und intervalUnit
+    }
+}
+
+class BackgroundWorker(appContext: Context, workerParams: WorkerParameters)
+    : Worker(appContext, workerParams) {
+
+    override fun doWork(): Result {
+        return try {
+            Log.d("MyWorker", "Tick at ${System.currentTimeMillis()}")
+
+            //TODO Hier die Hintergrundlogik einfügen (Background ändern)
+
+            Result.success()
+        } catch (e: Exception) {
+            Log.e("MyWorker", "Fehler im Hintergrunddienst", e)
+            Result.retry()
+        }
     }
 }
