@@ -33,6 +33,15 @@ jobs:
     - name: Unit-Tests ausführen
       run: ./gradlew testDebugUnitTest --stacktrace
 
+    - name: Build Debug- und Release-APK
+      run: ./gradlew assembleDebug assembleRelease --stacktrace
+
+    - name: Debug-APK prüfen
+      run: ls -lh app/build/outputs/apk/debug/
+
+    - name: Release-APK prüfen
+      run: ls -lh app/build/outputs/apk/release/
+
     - name: Debug-APK hochladen
       uses: actions/upload-artifact@v4
       with:
