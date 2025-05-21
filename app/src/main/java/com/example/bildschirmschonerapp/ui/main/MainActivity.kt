@@ -40,33 +40,36 @@ class MainActivity : AppCompatActivity() {
         // Power-Button Klick
         binding.buttonPower.setOnClickListener {
             //Toast.makeText(this, "Power-Button gedrückt", Toast.LENGTH_SHORT).show()
-
-                lifecycleScope.launch {
-                    try {
+            lifecycleScope.launch {
+                try {
                     val workManager = WorkManager.getInstance(this@MainActivity)
-                    val workInfos = workManager.getWorkInfosForUniqueWork("MyBackgroundWork").await()
+                    val workInfos =
+                        workManager.getWorkInfosForUniqueWork("MyBackgroundWork").await()
                     val isRunning = workInfos.any {
                         it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.RUNNING
                     }
 
                     if (isRunning) {
                         workManager.cancelUniqueWork("MyBackgroundWork")
-                        Toast.makeText(this@MainActivity, "Dienst gestoppt", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Dienst gestoppt", Toast.LENGTH_SHORT)
+                            .show()
                     } else {
-                        val workRequest = PeriodicWorkRequestBuilder<BackgroundWorker>(15, TimeUnit.MINUTES)
-                            .build()
+                        val workRequest =
+                            PeriodicWorkRequestBuilder<BackgroundWorker>(15, TimeUnit.MINUTES)
+                                .build()
 
                         workManager.enqueueUniquePeriodicWork(
                             "MyBackgroundWork",
                             ExistingPeriodicWorkPolicy.KEEP,
                             workRequest
                         )
-                        Toast.makeText(this@MainActivity, "Dienst gestartet", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Dienst gestartet", Toast.LENGTH_SHORT)
+                            .show()
                     }
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, e.message.toString(), Toast.LENGTH_SHORT)
+                        .show()
                 }
-                    catch (e: Exception){
-                        Toast.makeText(this@MainActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
-                    }
             }
 
         }
@@ -90,12 +93,24 @@ class MainActivity : AppCompatActivity() {
         // TextWatcher für Bildnummer (EditText)
         binding.editImgNumber.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                // Hier könnte Logik kommen, falls du mit der Eingabe etwas machen möchtest
+
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+
+        binding.radioBtnNew.setOnClickListener { view ->
+            binding.radioBtnNew.isChecked = true
+            binding.radioBtnAll.isChecked = false
+            mainViewModel.UseImgNumber = true
+        }
+
+        binding.radioBtnAll.setOnClickListener { view ->
+            binding.radioBtnAll.isChecked = true
+            binding.radioBtnNew.isChecked = false
+            mainViewModel.UseImgNumber = false
+        }
     }
 
     // Funktion zum Zurücksetzen der Werte
@@ -104,6 +119,8 @@ class MainActivity : AppCompatActivity() {
         binding.editInterval.setText("13") // Intervall auf Standardwert setzen
         binding.seekBar.progress = 13 // SeekBar auf Standardwert setzen
         binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
+        binding.radioBtnNew.isChecked = false
+        mainViewModel.UseImgNumber = false
         binding.intervalUnitSpinner.setSelection(0) // Intervall-Einheit auf den ersten Wert setzen
     }
 
@@ -112,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         val imgNumberStr = binding.editImgNumber.text.toString()
         if (imgNumberStr.isNotEmpty()) {
             val imgNumber = imgNumberStr.toInt()
-            // Verarbeite imgNumber, z.B. sende es ans Backend
+            mainViewModel.ImgNumber = imgNumber
         } else {
             Toast.makeText(this, "Bitte eine Zahl für die Bildanzahl eingeben", Toast.LENGTH_SHORT).show()
         }

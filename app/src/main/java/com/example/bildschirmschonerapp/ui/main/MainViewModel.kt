@@ -14,8 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import java.io.IOException
 import java.util.Random
+import kotlin.math.min
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+    public var ImgNumber = 0
+    public var UseImgNumber = false
+
     companion object {
         @Volatile
         private var INSTANCE: MainViewModel? = null
@@ -43,8 +47,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             println("No images found in the gallery.")
             return false
         }
-
-        val randomIndex = Random().nextInt(imageUris.size)
+        var randomIndex = 0
+        if (!UseImgNumber && ImgNumber != 0) {
+            randomIndex = Random().nextInt(imageUris.size)
+        }else{
+            println(ImgNumber)
+            randomIndex = Random().nextInt(min(imageUris.size,ImgNumber))
+        }
         println(randomIndex)
         val randomImageUri = imageUris[randomIndex]
 
