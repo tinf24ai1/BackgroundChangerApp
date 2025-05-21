@@ -1,8 +1,7 @@
 package com.example.bildschirmschonerapp.ui.main
 
 import android.Manifest
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.Manifest.permission.SET_WALLPAPER
+import android.app.Application
 import android.app.WallpaperManager
 import android.content.ContentUris
 import android.content.Context
@@ -10,16 +9,24 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Random
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        @Volatile
+        private var INSTANCE: MainViewModel? = null
+
+        fun getInstance(application: Application): MainViewModel {
+            return INSTANCE ?: synchronized(this) {
+                val instance = INSTANCE ?: MainViewModel(application).also { INSTANCE = it }
+                instance
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun setRandomWallpaper(context: Context): Boolean {
@@ -53,6 +60,8 @@ class MainViewModel : ViewModel() {
             println("Error setting wallpaper: ${e.localizedMessage}")
             return false
         }
+
+
     }
 
     private fun getAllImageUris(context: Context): List<Uri> {

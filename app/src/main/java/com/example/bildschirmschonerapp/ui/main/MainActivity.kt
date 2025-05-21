@@ -1,5 +1,6 @@
 package com.example.bildschirmschonerapp.ui.main
 
+import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -26,13 +27,14 @@ import kotlinx.coroutines.guava.await
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var mainViewModel: MainViewModel // Deklariere das ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
+        mainViewModel = MainViewModel.getInstance(application) // Hier die Singleton-Instanz abrufen
         // Klickaktionen definieren
 
         // Power-Button Klick
@@ -128,9 +130,8 @@ class BackgroundWorker(appContext: Context, workerParams: WorkerParameters)
     override fun doWork(): Result {
         return try {
             Log.d("MyWorker", "Tick at ${System.currentTimeMillis()}")
-            val vm = MainViewModel();
+            val vm = MainViewModel.getInstance(applicationContext as Application) // Hier die Singleton-Instanz abrufen
             vm.setRandomWallpaper(applicationContext)
-            //TODO Hier die Hintergrundlogik einfügen (Background ändern)
 
             Result.success()
         } catch (e: Exception) {
