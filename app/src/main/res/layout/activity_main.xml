@@ -15,13 +15,10 @@
 
         <TextView
             android:id="@+id/title"
+            style="@style/AppTitleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:padding="16dp"
-            android:text="Bildschirmschoner"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
+            android:text="Bildschirmschoner" />
     </LinearLayout>
 
     <!-- Radio Group for Image Options -->
@@ -32,6 +29,7 @@
         android:orientation="vertical">
 
         <RadioGroup
+            android:id="@+id/radioGroupImages"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -40,18 +38,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
+                android:gravity="center_vertical|end"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/imgAll"
+                    style="@style/OptionTitleText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:padding="16dp"
-                    android:text="Alle Bilder"
-                    android:textColor="@color/black"
-                    android:textSize="18sp" />
+                    android:text="Alle Bilder" />
 
                 <RadioButton
                     android:id="@+id/radioBtnAll"
@@ -62,15 +58,13 @@
 
             <View
                 android:id="@+id/line1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#AAAAAA" />
+                style="@style/DividerLine" />
 
             <!-- Option for Newest Images -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
+                android:gravity="center_vertical|end"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -81,41 +75,26 @@
 
                     <TextView
                         android:id="@+id/imgNew"
+                        style="@style/OptionTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingBottom="4dp"
-                        android:text="Neueste Bilder"
-                        android:textColor="@color/black"
-                        android:textSize="18sp" />
+                        android:text="Neueste Bilder" />
 
                     <TextView
                         android:id="@+id/imgNewDesc"
+                        style="@style/OptionDescriptionText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="16dp"
-                        android:paddingTop="4dp"
-                        android:paddingBottom="16dp"
-                        android:text="Wähle die Anzahl der letzten Bilder in der Galerie aus, die verwendet werden sollen"
-                        android:textSize="14sp"
-                        android:textStyle="italic" />
+                        android:text="Wähle die Anzahl der letzten Bilder in der Galerie aus, die verwendet werden sollen" />
                 </LinearLayout>
 
                 <FrameLayout
-                    android:layout_width="60dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/button_border">
+                    style="@style/InputFrame">
 
                     <EditText
                         android:id="@+id/editImgNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@android:color/transparent"
-                        android:hint="50"
-                        android:inputType="number"
-                        android:textColorHint="@color/black" />
+                        style="@style/NumberEditText"
+                        android:hint="50" />
                 </FrameLayout>
 
                 <RadioButton
@@ -134,23 +113,19 @@
 
             <View
                 android:id="@+id/line2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#AAAAAA" />
+                style="@style/DividerLine" />
 
             <TextView
                 android:id="@+id/interval"
+                style="@style/OptionTitleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="Intervall"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:text="Intervall" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
+                android:gravity="center_vertical|end"
                 android:orientation="horizontal">
 
                 <SeekBar
@@ -166,19 +141,12 @@
                     android:progressTint="#0000FF" />
 
                 <FrameLayout
-                    android:layout_width="60dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/button_border">
+                    style="@style/InputFrame">
 
                     <EditText
                         android:id="@+id/editInterval"
-                        android:layout_width="wrap_content"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@android:color/transparent"
-                        android:hint="13"
-                        android:inputType="number"
-                        android:textColorHint="@color/black" />
+                        style="@style/NumberEditText"
+                        android:hint="13" />
                 </FrameLayout>
 
                 <Spinner
@@ -187,7 +155,7 @@
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:entries="@array/interval_units"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -200,18 +168,13 @@
 
         <!-- Power Button -->
         <FrameLayout
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/button_border"
-            android:padding="25dp">
+            style="@style/IconFrameLarge">
 
             <ImageButton
                 android:id="@+id/button_power"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="end"
                 android:layout_marginBottom="50dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/power_button_desc"
@@ -223,23 +186,17 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:gravity="end"
             android:orientation="vertical">
 
             <FrameLayout
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/button_border">
+                style="@style/IconFrameSmall">
 
                 <ImageButton
                     android:id="@+id/button_reset"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/reset_button_desc"
-                    android:scaleType="fitCenter"
-                    android:src="@android:drawable/ic_menu_delete" />
+                    style="@style/IconButton"
+                    android:src="@android:drawable/ic_menu_delete"
+                    android:contentDescription="@string/reset_button_desc" />
             </FrameLayout>
 
             <TextView
@@ -252,5 +209,4 @@
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>
