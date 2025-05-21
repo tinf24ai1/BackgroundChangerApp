@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         // TextWatcher für Bildnummer (EditText)
         binding.editImgNumber.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-
+                getUserInput()
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
