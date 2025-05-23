@@ -1,9 +1,13 @@
 package com.example.bildschirmschonerapp.ui.main
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -11,6 +15,7 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -137,6 +142,35 @@ class MainActivity : AppCompatActivity() {
         val intervalValue = binding.seekBar.progress
         val intervalUnit = binding.intervalUnitSpinner.selectedItem.toString()
         // Verarbeite intervalValue und intervalUnit
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Post the dialog to run after the activity is ready
+        Handler(Looper.getMainLooper()).post {
+            checkPermissions(this@MainActivity)
+        }
+    }
+
+    private fun checkPermissions(context: Context) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            android.app.AlertDialog.Builder(context)
+                .setTitle("Berechtigung erforderlich")
+                .setMessage("Bitte aktiviere die erforderlichen Foto und Video Berechtigungen in den App-Einstellungen.")
+                .setPositiveButton("Zu den Einstellungen") { _, _ ->
+                    val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = android.net.Uri.fromParts("package", context.packageName, null)
+                    }
+                    context.startActivity(intent)
+                }
+                .setNegativeButton("Abbrechen", null)
+                .show()
+        }
     }
 }
 
