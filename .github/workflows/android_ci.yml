@@ -45,7 +45,9 @@ jobs:
 
     - name: Zipalign APK
       run: |
-        zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
+          BUILD_TOOLS_PATH=$(ls -d $ANDROID_SDK_ROOT/build-tools/* | sort -V | tail -n 1)
+          echo "Verwende Build Tools aus: $BUILD_TOOLS_PATH"
+            $BUILD_TOOLS_PATH/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
 
     - name: Unit-Tests ausführen
       run: ./gradlew testDebugUnitTest --stacktrace
