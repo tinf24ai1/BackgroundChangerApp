@@ -24,20 +24,16 @@ jobs:
     - name: Gradle Wrapper ausführbar machen
       run: chmod +x ./gradlew
 
-    # Keystore aus Secret erzeugen
     - name: Keystore aus Secret erstellen
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
 
-    # Lint prüfen
     - name: Lint prüfen
       run: ./gradlew lint
 
-    # APKs bauen (debug und release)
     - name: Mit Gradle bauen
       run: ./gradlew assembleDebug assembleRelease --stacktrace
 
-    # Release APK signieren (erfordert signierte APK, signiere mit Keystore)
     - name: Release APK signieren
       run: |
         jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
@@ -46,16 +42,13 @@ jobs:
           -keypass ${{ secrets.KEY_PASSWORD }} \
           app/build/outputs/apk/release/app-release-unsigned.apk my-key-alias
 
-    # Optional: zipalign (Android-Tool für optimierte APK)
     - name: Zipalign APK
       run: |
         zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
 
-    # Unit-Tests ausführen
     - name: Unit-Tests ausführen
       run: ./gradlew testDebugUnitTest --stacktrace
 
-    # Debug-APK hochladen
     - name: Debug-APK hochladen
       uses: actions/upload-artifact@v4
       with:
@@ -63,7 +56,6 @@ jobs:
         path: app/build/outputs/apk/debug/app-debug.apk
         if-no-files-found: error
     
-    # Release-APK hochladen (signierte APK)
     - name: Release-APK hochladen
       uses: actions/upload-artifact@v4
       with:
