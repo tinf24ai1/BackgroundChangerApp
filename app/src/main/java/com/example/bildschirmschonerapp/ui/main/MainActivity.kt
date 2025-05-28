@@ -44,7 +44,22 @@ class MainActivity : AppCompatActivity() {
 
         // Power-Button Klick
         binding.buttonPower.setOnClickListener {
-            //Toast.makeText(this, "Power-Button gedrückt", Toast.LENGTH_SHORT).show()
+            val intervalText = binding.editInterval.text.toString()
+            val interval = intervalText.toIntOrNull() ?: 15 // Fallback, falls leer oder ungültig
+
+            val selectedUnit = binding.intervalUnitSpinner.selectedItem.toString()
+            val timeUnit = when (selectedUnit.lowercase()) {
+                "stunden" -> TimeUnit.HOURS
+                "minuten" -> TimeUnit.MINUTES
+                else -> TimeUnit.MINUTES // Fallback
+            }
+
+            // Minimum-Check: PeriodicWorkRequest unterstützt nur 15+ Minuten!
+            if (timeUnit == TimeUnit.MINUTES && interval < 15) {
+                Toast.makeText(this, "Mindestintervall: 15 Minuten", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             lifecycleScope.launch {
                 try {
                     val workManager = WorkManager.getInstance(this@MainActivity)
@@ -56,20 +71,18 @@ class MainActivity : AppCompatActivity() {
 
                     if (isRunning) {
                         workManager.cancelUniqueWork("MyBackgroundWork")
-                        Toast.makeText(this@MainActivity, "Dienst gestoppt", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(this@MainActivity, "Dienst gestoppt", Toast.LENGTH_SHORT).show()
                     } else {
-                        val workRequest =
-                            PeriodicWorkRequestBuilder<BackgroundWorker>(15, TimeUnit.MINUTES)
-                                .build()
+                        val workRequest = PeriodicWorkRequestBuilder<BackgroundWorker>(
+                            interval.toLong(), timeUnit
+                        ).build()
 
                         workManager.enqueueUniquePeriodicWork(
                             "MyBackgroundWork",
                             ExistingPeriodicWorkPolicy.KEEP,
                             workRequest
                         )
-                        Toast.makeText(this@MainActivity, "Dienst gestartet", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(this@MainActivity, "Dienst gestartet", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Toast.makeText(this@MainActivity, e.message.toString(), Toast.LENGTH_SHORT)
