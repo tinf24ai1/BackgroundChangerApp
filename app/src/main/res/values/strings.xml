@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">BildschirmschonerApp</string>
+    <string name="power_button_desc">Power Button</string>
+    <string name="reset_button_desc">Zurücksetzen</string>
+    <string-array name="interval_units">
+        <item>Stunden</item>
+        <item>Minuten</item>
+    </string-array>
+
+</resources>

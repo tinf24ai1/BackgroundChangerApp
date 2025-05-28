@@ -1,0 +1,68 @@
+<resources>
+    <!-- Text Styles -->
+    <style name="AppTitleText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="OptionTitleText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="OptionDescriptionText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
+    <style name="DividerLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#AAAAAA</item>
+    </style>
+
+    <style name="InputFrame">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/button_border</item>
+    </style>
+
+    <style name="NumberEditText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:inputType">number</item>
+        <item name="android:textColorHint">@color/black</item>
+    </style>
+
+    <style name="IconFrameLarge">
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">150dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:background">@drawable/button_border</item>
+        <item name="android:padding">25dp</item>
+    </style>
+
+    <style name="IconFrameSmall">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/button_border</item>
+    </style>
+
+    <style name="IconButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+</resources>
