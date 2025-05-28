@@ -18,9 +18,9 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'temurin' 
-        cache: 'gradle' 
-        
+        distribution: 'temurin'
+        cache: 'gradle'
+
     - name: Gradle Wrapper ausführbar machen
       run: chmod +x ./gradlew
 
@@ -31,8 +31,12 @@ jobs:
     - name: Lint prüfen
       run: ./gradlew lint
 
+    - name: Unit-Tests ausführen
+      run: ./gradlew testDebugUnitTest --stacktrace
+
     - name: Mit Gradle bauen
       run: ./gradlew assembleDebug assembleRelease --stacktrace
+
 
     - name: Release APK signieren
       run: |
@@ -44,15 +48,9 @@ jobs:
 
     - name: Zipalign APK
       run: |
-          BUILD_TOOLS_PATH=$(ls -d $ANDROID_SDK_ROOT/build-tools/* | sort -V | tail -n 1)
-          echo "Verwende Build Tools aus: $BUILD_TOOLS_PATH"
-            $BUILD_TOOLS_PATH/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
-
-    - name: Unit-Tests ausführen
-      run: ./gradlew testDebugUnitTest --stacktrace
-
-    - name: Build Debug- und Release-APK
-      run: ./gradlew assembleDebug assembleRelease --stacktrace
+        BUILD_TOOLS_PATH=$(ls -d $ANDROID_SDK_ROOT/build-tools/* | sort -V | tail -n 1)
+        echo "Verwende Build Tools aus: $BUILD_TOOLS_PATH"
+        $BUILD_TOOLS_PATH/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
 
     - name: Debug-APK hochladen
       uses: actions/upload-artifact@v4
@@ -60,7 +58,7 @@ jobs:
         name: app-debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
         if-no-files-found: error
-    
+
     - name: Release-APK hochladen
       uses: actions/upload-artifact@v4
       with:
