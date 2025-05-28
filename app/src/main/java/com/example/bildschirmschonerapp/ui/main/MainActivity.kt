@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
                 else -> TimeUnit.MINUTES // Fallback
             }
 
-            // Minimum-Check: PeriodicWorkRequest unterstützt nur 15+ Minuten!
             if (timeUnit == TimeUnit.MINUTES && interval < 15) {
                 Toast.makeText(this, "Mindestintervall: 15 Minuten", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
