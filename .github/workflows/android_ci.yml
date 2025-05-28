@@ -28,7 +28,6 @@ jobs:
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
 
-
     - name: Lint prüfen
       run: ./gradlew lint
 
