@@ -281,11 +281,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions(context: Context) {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.READ_MEDIA_IMAGES
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.READ_MEDIA_IMAGES
+                    ) != PackageManager.PERMISSION_GRANTED
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                }
+                else -> {
+                    true
+                }
+        }) {
             android.app.AlertDialog.Builder(context)
                 .setTitle("Berechtigung erforderlich")
                 .setMessage("Bitte aktiviere die erforderlichen Foto und Video Berechtigungen in den App-Einstellungen.")
