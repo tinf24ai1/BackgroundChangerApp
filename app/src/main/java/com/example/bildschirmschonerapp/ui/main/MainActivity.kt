@@ -184,6 +184,18 @@ class MainActivity : AppCompatActivity() {
             binding.radioBtnNew.isChecked = false
             mainViewModel.UseImgNumber = false
         }
+        binding.toImage.setOnClickListener { view ->
+            if(mainViewModel.CurrentUri != null){
+                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                setDataAndType(mainViewModel.CurrentUri, "image/*")
+                flags = android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            startActivity(android.content.Intent.createChooser(intent, "Open with"))
+            } else {
+                Toast.makeText(this, "Aktuelles bild nicht vom Dienst gesetzt. Bitte starte den Dienst", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
     }
 
     // Funktion zum Zurücksetzen der Werte

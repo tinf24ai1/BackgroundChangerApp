@@ -19,6 +19,7 @@ import kotlin.math.min
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     public var ImgNumber = 50
     public var UseImgNumber = false
+    public var CurrentUri: Uri? = null;
 
     companion object {
         @Volatile
@@ -55,7 +56,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         println(randomIndex)
         val randomImageUri = imageUris[randomIndex]
-
+        CurrentUri = randomImageUri
         val wallpaperManager = WallpaperManager.getInstance(context)
 
         try {
