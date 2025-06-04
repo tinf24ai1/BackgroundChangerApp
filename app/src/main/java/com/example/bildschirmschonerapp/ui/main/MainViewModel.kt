@@ -17,7 +17,7 @@ import java.util.Random
 import kotlin.math.min
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-    public var ImgNumber = 0
+    public var ImgNumber = 50
     public var UseImgNumber = false
 
     companion object {
@@ -51,7 +51,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (!UseImgNumber || ImgNumber <= 0) {
             randomIndex = Random().nextInt(imageUris.size)
         }else{
-            println(ImgNumber)
             randomIndex = Random().nextInt(min(imageUris.size,ImgNumber))
         }
         println(randomIndex)

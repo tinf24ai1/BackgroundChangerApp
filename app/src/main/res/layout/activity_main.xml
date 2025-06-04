@@ -1,212 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp">
 
-    <!-- Title Section -->
-    <LinearLayout
-        android:id="@+id/titleDiv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp">
-
-        <TextView
-            android:id="@+id/title"
-            style="@style/AppTitleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bildschirmschoner" />
-    </LinearLayout>
-
-    <!-- Radio Group for Image Options -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
+        android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <RadioGroup
-            android:id="@+id/radioGroupImages"
+        <!-- Title Section -->
+        <!--<LinearLayout
+            android:id="@+id/titleDiv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:id="@+id/title"
+                style="@style/AppTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bildschirmschoner" />
+        </LinearLayout>-->
+
+        <!-- Image Options -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
             android:orientation="vertical">
 
-            <!-- Option for All Images -->
+            <!-- Radio Buttons -->
             <LinearLayout
+                android:id="@+id/radioGroupImages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/imgAll"
-                    style="@style/OptionTitleText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Alle Bilder" />
-
-                <RadioButton
-                    android:id="@+id/radioBtnAll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true" />
-            </LinearLayout>
-
-            <View
-                android:id="@+id/line1"
-                style="@style/DividerLine" />
-
-            <!-- Option for Newest Images -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal">
-
+                <!-- Option for All Images -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/imgNew"
+                        android:id="@+id/imgAll"
                         style="@style/OptionTitleText"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Neueste Bilder" />
+                        android:layout_weight="1"
+                        android:text="Alle Bilder" />
 
-                    <TextView
-                        android:id="@+id/imgNewDesc"
-                        style="@style/OptionDescriptionText"
+                    <RadioButton
+                        android:id="@+id/radioBtnAll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Wähle die Anzahl der letzten Bilder in der Galerie aus, die verwendet werden sollen" />
+                        android:checked="true" />
                 </LinearLayout>
 
-                <FrameLayout
-                    style="@style/InputFrame">
+                <View
+                    android:id="@+id/line1"
+                    style="@style/DividerLine" />
 
-                    <EditText
-                        android:id="@+id/editImgNumber"
-                        style="@style/NumberEditText"
-                        android:hint="50" />
-                </FrameLayout>
+                <!-- Option for Newest Images -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/radioBtnNew"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/imgNew"
+                            style="@style/OptionTitleText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Neueste Bilder" />
+
+                        <TextView
+                            android:id="@+id/imgNewDesc"
+                            style="@style/OptionDescriptionText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Wähle die Anzahl der letzten Bilder in der Galerie aus, die verwendet werden sollen" />
+                    </LinearLayout>
+
+                    <FrameLayout style="@style/InputFrame">
+
+                        <EditText
+                            android:id="@+id/editImgNumber"
+                            style="@style/NumberEditText"
+                            android:hint="0"
+                            android:imeOptions="actionDone" />
+                    </FrameLayout>
+
+                    <RadioButton
+                        android:id="@+id/radioBtnNew"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Interval Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/line2"
+                    style="@style/DividerLine" />
+
+                <TextView
+                    android:id="@+id/interval"
+                    style="@style/OptionTitleText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="false" />
-            </LinearLayout>
-        </RadioGroup>
+                    android:text="Intervall" />
 
-        <!-- Interval Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="24"
+                        android:min="1"
+                        android:progress="12"
+                        android:progressTint="@color/secondary_blue"
+                        android:stepSize="1"
+                        android:thumbTint="@color/primary_blue" />
+
+                    <FrameLayout style="@style/InputFrame">
+
+                        <EditText
+                            android:id="@+id/editInterval"
+                            style="@style/NumberEditText"
+                            android:hint="12"
+                            android:imeOptions="actionDone" />
+                    </FrameLayout>
+
+                    <Spinner
+                        android:id="@+id/intervalUnitSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_units"
+                        android:padding="16dp"
+                        android:textAlignment="center" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Action Buttons Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <View
-                android:id="@+id/line2"
-                style="@style/DividerLine" />
+            <!-- Power Button -->
+            <FrameLayout style="@style/IconFrameLarge">
 
-            <TextView
-                android:id="@+id/interval"
-                style="@style/OptionTitleText"
+                <ImageButton
+                    android:id="@+id/button_power"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="end"
+                    android:layout_marginBottom="50dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/power_button_desc"
+                    android:scaleType="fitCenter"
+                    android:src="@android:drawable/ic_lock_power_off" />
+            </FrameLayout>
+
+            <!-- Reset Button -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Intervall" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:id="@+id/seekBar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="24"
-                    android:min="1"
-                    android:progress="13"
-                    android:stepSize="1"
-                    android:thumbTint="@color/black"
-                    android:progressTint="#0000FF" />
+                android:gravity="end"
+                android:orientation="vertical">
 
                 <FrameLayout
-                    style="@style/InputFrame">
+                    style="@style/IconFrameSmall"
+                    android:layout_gravity="center_horizontal">
 
-                    <EditText
-                        android:id="@+id/editInterval"
-                        style="@style/NumberEditText"
-                        android:hint="13" />
+                    <ImageButton
+                        android:id="@+id/button_reset"
+                        style="@style/IconButton"
+                        android:contentDescription="@string/reset_button_desc"
+                        android:src="@android:drawable/ic_menu_delete" />
                 </FrameLayout>
 
-                <Spinner
-                    android:id="@+id/intervalUnitSpinner"
+                <TextView
+                    android:id="@+id/reset_button_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:entries="@array/interval_units"
-                    android:textAlignment="center" />
+                    android:layout_marginTop="6dp"
+                    android:text="@string/reset_button_desc"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-    <!-- Action Buttons Section -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- Power Button -->
-        <FrameLayout
-            style="@style/IconFrameLarge">
-
-            <ImageButton
-                android:id="@+id/button_power"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="end"
-                android:layout_marginBottom="50dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/power_button_desc"
-                android:scaleType="fitCenter"
-                android:src="@android:drawable/ic_lock_power_off" />
-        </FrameLayout>
-
-        <!-- Reset Button -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="vertical">
-
-            <FrameLayout
-                style="@style/IconFrameSmall">
-
-                <ImageButton
-                    android:id="@+id/button_reset"
-                    style="@style/IconButton"
-                    android:src="@android:drawable/ic_menu_delete"
-                    android:contentDescription="@string/reset_button_desc" />
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/reset_button_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/reset_button_desc"
-                android:textColor="@android:color/black"
-                android:textSize="14sp" />
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+</ScrollView>
