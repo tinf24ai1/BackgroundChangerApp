@@ -48,12 +48,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return false
         }
         var randomIndex = 0
-        println(ImgNumber)
-        println(UseImgNumber)
         if (!UseImgNumber || ImgNumber <= 0) {
             randomIndex = Random().nextInt(imageUris.size)
         }else{
-            println(min(imageUris.size,ImgNumber))
             randomIndex = Random().nextInt(min(imageUris.size,ImgNumber))
         }
         println(randomIndex)
