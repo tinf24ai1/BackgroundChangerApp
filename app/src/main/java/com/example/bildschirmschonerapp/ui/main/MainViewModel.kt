@@ -17,7 +17,7 @@ import java.util.Random
 import kotlin.math.min
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-    public var ImgNumber = 0
+    public var ImgNumber = 50
     public var UseImgNumber = false
 
     companion object {
