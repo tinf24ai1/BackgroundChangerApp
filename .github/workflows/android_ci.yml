@@ -34,23 +34,26 @@ jobs:
     - name: Unit-Tests ausführen
       run: ./gradlew testDebugUnitTest --stacktrace
 
-    - name: Mit Gradle bauen
+    - name: Mit Gradle bauen (unsigned APK)
       run: ./gradlew assembleDebug assembleRelease --stacktrace
 
-
-    - name: Release APK signieren
-      run: |
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-          -keystore keystore.jks \
-          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
-          -keypass ${{ secrets.KEY_PASSWORD }} \
-          app/build/outputs/apk/release/app-release-unsigned.apk my-key-alias
-
-    - name: Zipalign APK
+    - name: Release APK signieren und zipalignen
       run: |
         BUILD_TOOLS_PATH=$(ls -d $ANDROID_SDK_ROOT/build-tools/* | sort -V | tail -n 1)
         echo "Verwende Build Tools aus: $BUILD_TOOLS_PATH"
-        $BUILD_TOOLS_PATH/zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
+
+        $BUILD_TOOLS_PATH/apksigner sign \
+          --ks keystore.jks \
+          --ks-key-alias my-key-alias \
+          --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+          --out app/build/outputs/apk/release/app-release-signed.apk \
+          app/build/outputs/apk/release/app-release-unsigned.apk
+
+          
+        $BUILD_TOOLS_PATH/zipalign -v -p 4 \
+          app/build/outputs/apk/release/app-release-signed.apk \
+          app/build/outputs/apk/release/app-release.apk
 
     - name: Debug-APK hochladen
       uses: actions/upload-artifact@v4
