@@ -99,7 +99,7 @@
                         <EditText
                             android:id="@+id/editImgNumber"
                             style="@style/NumberEditText"
-                            android:hint="50"
+                            android:hint="0"
                             android:imeOptions="actionDone" />
                     </FrameLayout>
 

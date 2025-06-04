@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         mainViewModel = MainViewModel.getInstance(application) // Hier die Singleton-Instanz abrufen
+        binding.editImgNumber.setText("50") // Bildnummer auf sinvollen startwert setzen
         // Klickaktionen definieren
 
         // Power-Button Klick
@@ -187,7 +188,7 @@ class MainActivity : AppCompatActivity() {
 
     // Funktion zum Zurücksetzen der Werte
     private fun resetValues() {
-        binding.editImgNumber.setText("") // Bildnummer zurücksetzen
+        binding.editImgNumber.setText("50") // Bildnummer zurücksetzen
         binding.editInterval.setText("12") // Intervall auf Standardwert setzen
         binding.seekBar.progress = 12 // SeekBar auf Standardwert setzen
         binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
