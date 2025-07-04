@@ -135,6 +135,45 @@
                         android:layout_height="wrap_content"
                         android:checked="false" />
                 </LinearLayout>
+
+                <View
+                    android:id="@+id/line2_7"
+                    style="@style/DividerLine" />
+
+                <!-- Option for Cycle Through All -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/imgCycle"
+                            style="@style/OptionTitleText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Alle durchgehen" />
+
+                        <TextView
+                            android:id="@+id/imgCycleDesc"
+                            style="@style/OptionDescriptionText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Zeigt alle Bilder nacheinander an, bevor der Zyklus wiederholt wird" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:id="@+id/radioBtnCycle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Interval Section -->

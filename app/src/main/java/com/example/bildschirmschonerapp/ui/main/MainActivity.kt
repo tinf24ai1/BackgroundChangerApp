@@ -177,24 +177,44 @@ class MainActivity : AppCompatActivity() {
             binding.radioBtnNew.isChecked = true
             binding.radioBtnAll.isChecked = false
             binding.radioBtnBackgrounds.isChecked = false
+            binding.radioBtnCycle.isChecked = false
             mainViewModel.UseImgNumber = true
             mainViewModel.UseBackgroundsFolder = false
+            mainViewModel.UseCycleMode = false
+            mainViewModel.resetCycle()
         }
 
         binding.radioBtnAll.setOnClickListener { _ ->
             binding.radioBtnAll.isChecked = true
             binding.radioBtnNew.isChecked = false
             binding.radioBtnBackgrounds.isChecked = false
+            binding.radioBtnCycle.isChecked = false
             mainViewModel.UseImgNumber = false
             mainViewModel.UseBackgroundsFolder = false
+            mainViewModel.UseCycleMode = false
+            mainViewModel.resetCycle()
         }
 
         binding.radioBtnBackgrounds.setOnClickListener { _ ->
             binding.radioBtnBackgrounds.isChecked = true
             binding.radioBtnAll.isChecked = false
             binding.radioBtnNew.isChecked = false
+            binding.radioBtnCycle.isChecked = false
             mainViewModel.UseImgNumber = false
             mainViewModel.UseBackgroundsFolder = true
+            mainViewModel.UseCycleMode = false
+            mainViewModel.resetCycle()
+        }
+
+        binding.radioBtnCycle.setOnClickListener { _ ->
+            binding.radioBtnCycle.isChecked = true
+            binding.radioBtnAll.isChecked = false
+            binding.radioBtnNew.isChecked = false
+            binding.radioBtnBackgrounds.isChecked = false
+            mainViewModel.UseImgNumber = false
+            mainViewModel.UseBackgroundsFolder = false
+            mainViewModel.UseCycleMode = true
+            mainViewModel.resetCycle()
         }
 
         // MIUI CheckBox Change Listener
@@ -211,10 +231,13 @@ class MainActivity : AppCompatActivity() {
         binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
         binding.radioBtnNew.isChecked = false
         binding.radioBtnBackgrounds.isChecked = false
+        binding.radioBtnCycle.isChecked = false
         binding.checkBoxMiui.isChecked = true // MIUI-Schutz aktivieren
         mainViewModel.UseImgNumber = false
         mainViewModel.UseBackgroundsFolder = false
+        mainViewModel.UseCycleMode = false
         mainViewModel.preventMiuiThemeChange = true
+        mainViewModel.resetCycle()
         binding.intervalUnitSpinner.setSelection(0) // Intervall-Einheit auf den ersten Wert setzen
     }
 
@@ -223,7 +246,12 @@ class MainActivity : AppCompatActivity() {
         val imgNumberStr = binding.editImgNumber.text.toString()
         if (imgNumberStr.isNotEmpty()) {
             val imgNumber = imgNumberStr.toInt()
+            val previousImgNumber = mainViewModel.ImgNumber
             mainViewModel.ImgNumber = imgNumber
+            // Reset cycle if image number changed
+            if (previousImgNumber != imgNumber && mainViewModel.UseCycleMode) {
+                mainViewModel.resetCycle()
+            }
         } else {
             Toast.makeText(this, "Bitte eine Zahl für die Bildanzahl eingeben", Toast.LENGTH_SHORT)
                 .show()

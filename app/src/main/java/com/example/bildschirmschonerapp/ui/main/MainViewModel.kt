@@ -20,9 +20,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     public var ImgNumber = 50
     public var UseImgNumber = false
     public var UseBackgroundsFolder = false
+    public var UseCycleMode = false
     public var intervalValue = 12
     public var intervalUnit = "Stunden"
     public var preventMiuiThemeChange = true
+    
+    // Variables for cycle mode
+    private var currentImageIndex = 0
+    private var imageUrisList: List<Uri> = emptyList()
+    private var cycleInitialized = false
 
     companion object {
         @Volatile
@@ -55,18 +61,46 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             println("No images found in the gallery.")
             return false
         }
-        val randomIndex = if (!UseImgNumber || ImgNumber <= 0) {
-            Random().nextInt(imageUris.size)
+
+        val selectedImageUri = if (UseCycleMode) {
+            // Cycle mode: go through all images sequentially
+            if (!cycleInitialized || imageUrisList != imageUris) {
+                // Initialize or refresh the image list
+                imageUrisList = if (!UseImgNumber || ImgNumber <= 0) {
+                    imageUris
+                } else {
+                    imageUris.take(min(imageUris.size, ImgNumber))
+                }
+                currentImageIndex = 0
+                cycleInitialized = true
+                println("Cycle mode initialized with ${imageUrisList.size} images")
+            }
+            
+            val selectedUri = imageUrisList[currentImageIndex]
+            println("Cycle mode: showing image ${currentImageIndex + 1} of ${imageUrisList.size}")
+            
+            // Move to next image, reset to 0 if we've reached the end
+            currentImageIndex = (currentImageIndex + 1) % imageUrisList.size
+            if (currentImageIndex == 0) {
+                println("Cycle completed, starting over")
+            }
+            
+            selectedUri
         } else {
-            Random().nextInt(min(imageUris.size, ImgNumber))
+            // Random mode: select a random image
+            val randomIndex = if (!UseImgNumber || ImgNumber <= 0) {
+                Random().nextInt(imageUris.size)
+            } else {
+                Random().nextInt(min(imageUris.size, ImgNumber))
+            }
+            println("Random mode: selected image at index $randomIndex")
+            imageUris[randomIndex]
         }
-        println(randomIndex)
-        val randomImageUri = imageUris[randomIndex]
 
         val wallpaperManager = WallpaperManager.getInstance(context)
 
         try {
-            context.contentResolver.openInputStream(randomImageUri)?.use { inputStream ->
+            context.contentResolver.openInputStream(selectedImageUri)?.use { inputStream ->
                 if (preventMiuiThemeChange && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     try {
                         // Für MIUI: Verhindere automatische Theme-Änderungen
@@ -129,5 +163,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         return imageUris
+    }
+
+    // Function to reset the cycle when settings change
+    fun resetCycle() {
+        currentImageIndex = 0
+        cycleInitialized = false
+        imageUrisList = emptyList()
+        println("Cycle reset")
     }
 }
