@@ -22,6 +22,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     public var UseBackgroundsFolder = false
     public var intervalValue = 12
     public var intervalUnit = "Stunden"
+    public var preventMiuiThemeChange = true
 
     companion object {
         @Volatile
@@ -66,7 +67,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         try {
             context.contentResolver.openInputStream(randomImageUri)?.use { inputStream ->
-                wallpaperManager.setStream(inputStream)
+                if (preventMiuiThemeChange && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    try {
+                        // Für MIUI: Verhindere automatische Theme-Änderungen
+                        // Setze nur das Hintergrundbild für den Homescreen, nicht das Lockscreen
+                        wallpaperManager.setStream(inputStream, null, true, WallpaperManager.FLAG_SYSTEM)
+                    } catch (e: Exception) {
+                        // Fallback zur normalen Methode
+                        println("MIUI-spezifische Methode fehlgeschlagen, verwende Standard-Methode: ${e.message}")
+                        wallpaperManager.setStream(inputStream)
+                    }
+                } else {
+                    wallpaperManager.setStream(inputStream)
+                }
             }
             println("Wallpaper set successfully!")
             return true

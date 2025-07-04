@@ -196,6 +196,11 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.UseImgNumber = false
             mainViewModel.UseBackgroundsFolder = true
         }
+
+        // MIUI CheckBox Change Listener
+        binding.checkBoxMiui.setOnCheckedChangeListener { _, isChecked ->
+            mainViewModel.preventMiuiThemeChange = isChecked
+        }
     }
 
     // Funktion zum Zurücksetzen der Werte
@@ -206,8 +211,10 @@ class MainActivity : AppCompatActivity() {
         binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
         binding.radioBtnNew.isChecked = false
         binding.radioBtnBackgrounds.isChecked = false
+        binding.checkBoxMiui.isChecked = true // MIUI-Schutz aktivieren
         mainViewModel.UseImgNumber = false
         mainViewModel.UseBackgroundsFolder = false
+        mainViewModel.preventMiuiThemeChange = true
         binding.intervalUnitSpinner.setSelection(0) // Intervall-Einheit auf den ersten Wert setzen
     }
 
