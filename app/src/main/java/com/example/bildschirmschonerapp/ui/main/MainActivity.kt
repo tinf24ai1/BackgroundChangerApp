@@ -110,6 +110,27 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        // Test Now Button - Immediate wallpaper change
+        binding.buttonTestNow.setOnClickListener {
+            lifecycleScope.launch {
+                try {
+                    // Get current user input first
+                    getUserInput()
+                    
+                    // Change wallpaper immediately
+                    val success = mainViewModel.setRandomWallpaper(this@MainActivity)
+                    
+                    if (success) {
+                        Toast.makeText(this@MainActivity, "Hintergrundbild geändert!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Fehler beim Ändern des Hintergrundbilds", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         // Reset-Button Klick
         binding.buttonReset.setOnClickListener {
             Toast.makeText(this, "Reset-Button gedrückt", Toast.LENGTH_SHORT).show()
