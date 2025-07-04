@@ -173,16 +173,28 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        binding.radioBtnNew.setOnClickListener { view ->
+        binding.radioBtnNew.setOnClickListener { _ ->
             binding.radioBtnNew.isChecked = true
             binding.radioBtnAll.isChecked = false
+            binding.radioBtnBackgrounds.isChecked = false
             mainViewModel.UseImgNumber = true
+            mainViewModel.UseBackgroundsFolder = false
         }
 
-        binding.radioBtnAll.setOnClickListener { view ->
+        binding.radioBtnAll.setOnClickListener { _ ->
             binding.radioBtnAll.isChecked = true
             binding.radioBtnNew.isChecked = false
+            binding.radioBtnBackgrounds.isChecked = false
             mainViewModel.UseImgNumber = false
+            mainViewModel.UseBackgroundsFolder = false
+        }
+
+        binding.radioBtnBackgrounds.setOnClickListener { _ ->
+            binding.radioBtnBackgrounds.isChecked = true
+            binding.radioBtnAll.isChecked = false
+            binding.radioBtnNew.isChecked = false
+            mainViewModel.UseImgNumber = false
+            mainViewModel.UseBackgroundsFolder = true
         }
     }
 
@@ -193,7 +205,9 @@ class MainActivity : AppCompatActivity() {
         binding.seekBar.progress = 12 // SeekBar auf Standardwert setzen
         binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
         binding.radioBtnNew.isChecked = false
+        binding.radioBtnBackgrounds.isChecked = false
         mainViewModel.UseImgNumber = false
+        mainViewModel.UseBackgroundsFolder = false
         binding.intervalUnitSpinner.setSelection(0) // Intervall-Einheit auf den ersten Wert setzen
     }
 
@@ -210,7 +224,10 @@ class MainActivity : AppCompatActivity() {
 
         val intervalValue = binding.seekBar.progress
         val intervalUnit = binding.intervalUnitSpinner.selectedItem.toString()
-        // Verarbeite intervalValue und intervalUnit
+        
+        // Store the interval settings in the ViewModel
+        mainViewModel.intervalValue = intervalValue
+        mainViewModel.intervalUnit = intervalUnit
     }
 
     private fun updateSeekBarRange(min: Int, max: Int) {

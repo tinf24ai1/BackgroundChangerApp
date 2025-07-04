@@ -19,6 +19,9 @@ import kotlin.math.min
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     public var ImgNumber = 50
     public var UseImgNumber = false
+    public var UseBackgroundsFolder = false
+    public var intervalValue = 12
+    public var intervalUnit = "Stunden"
 
     companion object {
         @Volatile
@@ -41,17 +44,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return false
         }
 
-        val imageUris = getAllImageUris(context)
+        val imageUris = if (UseBackgroundsFolder) {
+            getImageUrisFromBackgroundsFolder(context)
+        } else {
+            getAllImageUris(context)
+        }
 
         if (imageUris.isEmpty()) {
             println("No images found in the gallery.")
             return false
         }
-        var randomIndex = 0
-        if (!UseImgNumber || ImgNumber <= 0) {
-            randomIndex = Random().nextInt(imageUris.size)
-        }else{
-            randomIndex = Random().nextInt(min(imageUris.size,ImgNumber))
+        val randomIndex = if (!UseImgNumber || ImgNumber <= 0) {
+            Random().nextInt(imageUris.size)
+        } else {
+            Random().nextInt(min(imageUris.size, ImgNumber))
         }
         println(randomIndex)
         val randomImageUri = imageUris[randomIndex]
@@ -79,6 +85,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val sortOrder = "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
 
         context.contentResolver.query(uri, projection, null, null, sortOrder)?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                imageUris.add(imageUri)
+            }
+        }
+        return imageUris
+    }
+
+    private fun getImageUrisFromBackgroundsFolder(context: Context): List<Uri> {
+        val imageUris = mutableListOf<Uri>()
+        val projection = arrayOf(
+            MediaStore.Images.Media._ID,
+            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Images.Media.DATA
+        )
+        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?"
+        val selectionArgs = arrayOf("Hintergründe")
+        val sortOrder = "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
+
+        context.contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
