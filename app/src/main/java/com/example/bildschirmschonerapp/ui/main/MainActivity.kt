@@ -3,43 +3,49 @@ package com.example.bildschirmschonerapp.ui.main
 import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.MotionEvent
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.example.bildschirmschonerapp.databinding.ActivityMainBinding
-import java.util.concurrent.TimeUnit
-import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkInfo
-import androidx.appcompat.app.AppCompatDelegate
 import com.example.bildschirmschonerapp.R
-import kotlinx.coroutines.launch
-//import kotlinx.coroutines.tasks.await
+import com.example.bildschirmschonerapp.databinding.ActivityMainBinding
 import kotlinx.coroutines.guava.await
-import android.view.inputmethod.EditorInfo
-import android.graphics.Rect
-import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel // Deklariere das ViewModel
-    private var minSeekValue = 1
+    private lateinit var mainViewModel: MainViewModel
+    private var statusUpdateHandler: Handler? = null
+    private var statusUpdateRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -48,11 +54,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        mainViewModel = MainViewModel.getInstance(application) // Hier die Singleton-Instanz abrufen
-        binding.editImgNumber.setText("50") // Bildnummer auf sinvollen startwert setzen
-        // Klickaktionen definieren
+        mainViewModel = MainViewModel.getInstance(application)
+        binding.editImgNumber.setText("50")
 
-        // Power-Button Klick
+        setupClickListeners()
+    }
+
+    private fun setupClickListeners() {
         binding.buttonPower.setOnClickListener {
             val intervalText = binding.editInterval.text.toString()
             val interval = intervalText.toIntOrNull() ?: 15 // Fallback, falls leer oder ungültig
@@ -87,13 +95,22 @@ class MainActivity : AppCompatActivity() {
                             ContextCompat.getColor(this@MainActivity, R.color.power_inactive)
                         )
                     } else {
+                        // Create constraints to make WorkManager more reliable
+                        val constraints = Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                            .setRequiresBatteryNotLow(false)
+                            .setRequiresCharging(false)
+                            .setRequiresDeviceIdle(false)
+                            .setRequiresStorageNotLow(false)
+                            .build()
+
                         val workRequest = PeriodicWorkRequestBuilder<BackgroundWorker>(
                             interval.toLong(), timeUnit
-                        ).build()
+                        ).setConstraints(constraints).build()
 
                         workManager.enqueueUniquePeriodicWork(
                             "MyBackgroundWork",
-                            ExistingPeriodicWorkPolicy.KEEP,
+                            ExistingPeriodicWorkPolicy.UPDATE, // Use UPDATE instead of deprecated REPLACE
                             workRequest
                         )
                         Toast.makeText(this@MainActivity, "Dienst gestartet", Toast.LENGTH_SHORT)
@@ -107,21 +124,28 @@ class MainActivity : AppCompatActivity() {
                         .show()
                 }
             }
-
         }
 
-        // Reset-Button Klick
         binding.buttonReset.setOnClickListener {
             Toast.makeText(this, "Reset-Button gedrückt", Toast.LENGTH_SHORT).show()
-            resetValues()  // Alle Eingabefelder zurücksetzen
+            resetValues()
+        }
+        
+        binding.buttonChangeNow.setOnClickListener {
+            changeWallpaperNow()
         }
 
-        // SeekBar Change Listener
+        setupSeekBarAndSpinner()
+        setupRadioButtons()
+        setupMiuiCheckbox()
+        startStatusUpdates()
+    }
+
+    private fun setupSeekBarAndSpinner() {
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.editInterval.setText(progress.toString()) // Intervallwert im EditText anzeigen
+                binding.editInterval.setText(progress.toString())
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
@@ -163,95 +187,76 @@ class MainActivity : AppCompatActivity() {
 
             override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
         })
-        // TextWatcher für Bildnummer (EditText)
+
         binding.editImgNumber.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 getUserInput()
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+    }
 
+    private fun setupRadioButtons() {
         binding.radioBtnNew.setOnClickListener { _ ->
             binding.radioBtnNew.isChecked = true
             binding.radioBtnAll.isChecked = false
             binding.radioBtnBackgrounds.isChecked = false
-            binding.radioBtnCycle.isChecked = false
             mainViewModel.UseImgNumber = true
             mainViewModel.UseBackgroundsFolder = false
-            mainViewModel.UseCycleMode = false
             mainViewModel.resetCycle()
+            updateCycleStatus()
         }
 
         binding.radioBtnAll.setOnClickListener { _ ->
             binding.radioBtnAll.isChecked = true
             binding.radioBtnNew.isChecked = false
             binding.radioBtnBackgrounds.isChecked = false
-            binding.radioBtnCycle.isChecked = false
             mainViewModel.UseImgNumber = false
             mainViewModel.UseBackgroundsFolder = false
-            mainViewModel.UseCycleMode = false
             mainViewModel.resetCycle()
+            updateCycleStatus()
         }
 
         binding.radioBtnBackgrounds.setOnClickListener { _ ->
             binding.radioBtnBackgrounds.isChecked = true
             binding.radioBtnAll.isChecked = false
             binding.radioBtnNew.isChecked = false
-            binding.radioBtnCycle.isChecked = false
             mainViewModel.UseImgNumber = false
             mainViewModel.UseBackgroundsFolder = true
-            mainViewModel.UseCycleMode = false
             mainViewModel.resetCycle()
+            updateCycleStatus()
         }
+    }
 
-        binding.radioBtnCycle.setOnClickListener { _ ->
-            binding.radioBtnCycle.isChecked = true
-            binding.radioBtnAll.isChecked = false
-            binding.radioBtnNew.isChecked = false
-            binding.radioBtnBackgrounds.isChecked = false
-            mainViewModel.UseImgNumber = false
-            mainViewModel.UseBackgroundsFolder = false
-            mainViewModel.UseCycleMode = true
-            mainViewModel.resetCycle()
-        }
-
-        // MIUI CheckBox Change Listener
+    private fun setupMiuiCheckbox() {
         binding.checkBoxMiui.setOnCheckedChangeListener { _, isChecked ->
             mainViewModel.preventMiuiThemeChange = isChecked
         }
     }
 
-    // Funktion zum Zurücksetzen der Werte
     private fun resetValues() {
-        binding.editImgNumber.setText("50") // Bildnummer zurücksetzen
-        binding.editInterval.setText("12") // Intervall auf Standardwert setzen
-        binding.seekBar.progress = 12 // SeekBar auf Standardwert setzen
-        binding.radioBtnAll.isChecked = true // RadioButton "Alle Bilder" auswählen
+        binding.editImgNumber.setText("50")
+        binding.editInterval.setText("12")
+        binding.seekBar.progress = 12
+        binding.radioBtnAll.isChecked = true
         binding.radioBtnNew.isChecked = false
         binding.radioBtnBackgrounds.isChecked = false
-        binding.radioBtnCycle.isChecked = false
-        binding.checkBoxMiui.isChecked = true // MIUI-Schutz aktivieren
+        binding.checkBoxMiui.isChecked = true
         mainViewModel.UseImgNumber = false
         mainViewModel.UseBackgroundsFolder = false
-        mainViewModel.UseCycleMode = false
         mainViewModel.preventMiuiThemeChange = true
         mainViewModel.resetCycle()
-        binding.intervalUnitSpinner.setSelection(0) // Intervall-Einheit auf den ersten Wert setzen
+        binding.intervalUnitSpinner.setSelection(0)
+        updateCycleStatus()
+        Toast.makeText(this, "Einstellungen zurückgesetzt", Toast.LENGTH_SHORT).show()
     }
 
-    // Funktion, um die aktuellen Einstellungen zu holen
     private fun getUserInput() {
         val imgNumberStr = binding.editImgNumber.text.toString()
         if (imgNumberStr.isNotEmpty()) {
             val imgNumber = imgNumberStr.toInt()
-            val previousImgNumber = mainViewModel.ImgNumber
             mainViewModel.ImgNumber = imgNumber
-            // Reset cycle if image number changed
-            if (previousImgNumber != imgNumber && mainViewModel.UseCycleMode) {
-                mainViewModel.resetCycle()
-            }
         } else {
             Toast.makeText(this, "Bitte eine Zahl für die Bildanzahl eingeben", Toast.LENGTH_SHORT)
                 .show()
@@ -260,7 +265,6 @@ class MainActivity : AppCompatActivity() {
         val intervalValue = binding.seekBar.progress
         val intervalUnit = binding.intervalUnitSpinner.selectedItem.toString()
         
-        // Store the interval settings in the ViewModel
         mainViewModel.intervalValue = intervalValue
         mainViewModel.intervalUnit = intervalUnit
     }
@@ -330,6 +334,7 @@ class MainActivity : AppCompatActivity() {
         // Post the dialog to run after the activity is ready
         Handler(Looper.getMainLooper()).post {
             checkPermissions(this@MainActivity)
+            checkBatteryOptimization(this@MainActivity)
         }
     }
 
@@ -367,6 +372,83 @@ class MainActivity : AppCompatActivity() {
                 .show()
         }
     }
+
+    private fun checkBatteryOptimization(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val packageName = packageName
+            
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                android.app.AlertDialog.Builder(context)
+                    .setTitle("Batterieoptimierung deaktivieren")
+                    .setMessage("Für eine zuverlässige Funktion der App sollte die Batterieoptimierung deaktiviert werden. Dies verhindert, dass Android die App nach 30 Minuten stoppt.")
+                    .setPositiveButton("Zu den Einstellungen") { _, _ ->
+                        try {
+                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            // Fallback zur allgemeinen Batterieeinstellung
+                            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                            startActivity(intent)
+                        }
+                    }
+                    .setNegativeButton("Später", null)
+                    .show()
+            }
+        }
+    }
+
+    private fun changeWallpaperNow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            lifecycleScope.launch {
+                try {
+                    binding.buttonChangeNow.isEnabled = false
+                    binding.buttonChangeNow.text = "Wird geändert..."
+                    
+                    val success = mainViewModel.setManualWallpaper(this@MainActivity)
+                    
+                    if (success) {
+                        Toast.makeText(this@MainActivity, "Hintergrundbild erfolgreich geändert!", Toast.LENGTH_SHORT).show()
+                        updateCycleStatus()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Fehler beim Ändern des Hintergrundbilds", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("MainActivity", "Error changing wallpaper manually", e)
+                } finally {
+                    binding.buttonChangeNow.isEnabled = true
+                    binding.buttonChangeNow.text = "Jetzt ändern"
+                }
+            }
+        } else {
+            Toast.makeText(this, "Diese Funktion erfordert Android 13+", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun updateCycleStatus() {
+        val status = mainViewModel.getCycleStatus()
+        binding.textCycleStatus.text = "Durchlauf: $status"
+    }
+    
+    private fun startStatusUpdates() {
+        statusUpdateHandler = Handler(Looper.getMainLooper())
+        statusUpdateRunnable = object : Runnable {
+            override fun run() {
+                updateCycleStatus()
+                statusUpdateHandler?.postDelayed(this, 5000) // Update every 5 seconds
+            }
+        }
+        statusUpdateHandler?.post(statusUpdateRunnable!!)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        statusUpdateHandler?.removeCallbacks(statusUpdateRunnable!!)
+    }
+
 }
 
 class BackgroundWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -376,13 +458,23 @@ class BackgroundWorker(appContext: Context, workerParams: WorkerParameters) :
     override fun doWork(): Result {
         return try {
             Log.d("MyWorker", "Tick at ${System.currentTimeMillis()}")
-            val vm =
-                MainViewModel.getInstance(applicationContext as Application) // Hier die Singleton-Instanz abrufen
-            vm.setRandomWallpaper(applicationContext)
-
-            Result.success()
+            val vm = MainViewModel.getInstance(applicationContext as Application)
+            
+            // Check if the ViewModel state is still valid
+            Log.d("MyWorker", "UseImgNumber: ${vm.UseImgNumber}, UseBackgroundsFolder: ${vm.UseBackgroundsFolder}")
+            
+            val success = vm.setRandomWallpaper(applicationContext)
+            
+            if (success) {
+                Log.d("MyWorker", "Wallpaper changed successfully")
+                Result.success()
+            } else {
+                Log.w("MyWorker", "Failed to change wallpaper, retrying...")
+                Result.retry()
+            }
         } catch (e: Exception) {
             Log.e("MyWorker", "Fehler im Hintergrunddienst", e)
+            // Don't give up immediately, try again
             Result.retry()
         }
     }

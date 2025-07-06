@@ -135,45 +135,6 @@
                         android:layout_height="wrap_content"
                         android:checked="false" />
                 </LinearLayout>
-
-                <View
-                    android:id="@+id/line2_7"
-                    style="@style/DividerLine" />
-
-                <!-- Option for Cycle Through All -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical|end"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/imgCycle"
-                            style="@style/OptionTitleText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Alle durchgehen" />
-
-                        <TextView
-                            android:id="@+id/imgCycleDesc"
-                            style="@style/OptionDescriptionText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Zeigt alle Bilder nacheinander an, bevor der Zyklus wiederholt wird" />
-                    </LinearLayout>
-
-                    <RadioButton
-                        android:id="@+id/radioBtnCycle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="false" />
-                </LinearLayout>
             </LinearLayout>
 
             <!-- Interval Section -->
@@ -282,6 +243,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <!-- Status Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/status_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/textCycleStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Durchlauf: 0/0"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Manual Change Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonChangeNow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/button_primary_ripple"
+                    android:elevation="4dp"
+                    android:paddingHorizontal="32dp"
+                    android:paddingVertical="16dp"
+                    android:text="Jetzt ändern"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <!-- Power Button -->
             <FrameLayout style="@style/IconFrameLarge">
